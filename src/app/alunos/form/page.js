@@ -3,6 +3,7 @@
 import Pagina from "@/components/Pagina";
 import { Formik } from "formik";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { FaArrowLeft, FaCheck, FaTrash } from "react-icons/fa";
 import ReactInputMask from "react-input-mask";
@@ -101,6 +102,16 @@ export default function alunosFormPage(props) {
             handleSubmit,
             handleReset,
           }) => {
+            const [cursosFiltrados, setCursosFiltrados] = useState([]);
+
+            useEffect(() => {
+              // Filtrar os cursos com base na faculdade selecionada
+              const cursosFiltrados = cursos.filter((curso) => {
+                return curso.faculdade === values.faculdade;
+              });
+              setCursosFiltrados(cursosFiltrados);
+            }, [values.faculdade, cursos]);
+
             // ações do formulário
             // debug
             // console.log("DEBUG >>>")
@@ -236,15 +247,17 @@ export default function alunosFormPage(props) {
                     <Form.Label>Curso:</Form.Label>
                     <Form.Select
                       name="curso"
-                      value={values.cursos}
+                      value={values.curso}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       isValid={touched.curso && !errors.curso}
                       isInvalid={touched.curso && errors.curso}
                     >
                       <option value="">Selecione</option>
-                      {cursos.map((curso) => (
-                        <option value={curso.nome}>{curso.nome}</option>
+                      {cursosFiltrados.map((curso) => (
+                        <option key={curso.id} value={curso.nome}>
+                          {curso.nome}
+                        </option>
                       ))}
                     </Form.Select>
                     <Form.Control.Feedback type="invalid">
