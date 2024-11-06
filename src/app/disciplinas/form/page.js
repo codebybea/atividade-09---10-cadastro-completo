@@ -3,12 +3,15 @@
 import Pagina from "@/components/Pagina";
 import { Formik } from "formik";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { FaArrowLeft, FaCheck } from "react-icons/fa";
 import { v4 } from "uuid";
 import * as Yup from "yup";
 
 export default function DisciplinasFormPage(props) {
+  const [professorFiltrado, setProfessorFiltrado] = useState([]);
+
   // router -> hook para navegação de telas
   const router = useRouter();
 
@@ -88,6 +91,16 @@ export default function DisciplinasFormPage(props) {
             handleSubmit,
           }) => {
             // ações do formulário
+            useEffect(() => {
+              if (values.curso !== "") {
+                const teacherFiltered = professores.filter(
+                  (professor) => professor.curso == values.curso
+                );
+                console.log(teacherFiltered);
+                setProfessorFiltrado(teacherFiltered);
+              }
+            }, [values.curso]);
+
             // debug
             // console.log("DEBUG >>>")
             // console.log({values, errors, touched})
@@ -179,14 +192,13 @@ export default function DisciplinasFormPage(props) {
                       value={values.professores}
                       onChange={handleChange}
                       onBlur={handleBlur}
+                      disabled={values.curso == ""}
                       isValid={touched.professores && !errors.professores}
                       isInvalid={touched.professores && errors.professores}
                     >
                       <option value="">Selecione</option>
-                      {professores.map((professores) => (
-                        <option value={professores.nome}>
-                          {professores.nome}
-                        </option>
+                      {professorFiltrado.map((professor) => (
+                        <option value={professor.nome}>{professor.nome}</option>
                       ))}
                     </Form.Select>
                     <Form.Control.Feedback type="invalid">
